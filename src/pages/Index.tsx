@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown, MessageCircle, X } from 'lucide-react';
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navigation from '@/components/Navigation';
@@ -9,6 +9,9 @@ import ActivityCard from '@/components/ActivityCard';
 import PricingCard from '@/components/PricingCard';
 import TestimonialCard from '@/components/TestimonialCard';
 import { MotionWrapper } from '@/components/animations/MotionWrapper';
+import { toast } from "sonner";
+import LiveChat from '@/components/LiveChat';
+import { getPreferences, savePreferences } from '@/utils/preferences';
 
 const activities = [
   {
@@ -85,34 +88,81 @@ const testimonials = [
     name: 'Sarah Johnson',
     role: 'Adventure Enthusiast',
     text: 'AquaVenture provided my family with the perfect mix of excitement and relaxation. The kids loved the slides while my husband and I enjoyed the spa zone.',
-    rating: 5
+    rating: 5 as const
   },
   {
     name: 'Michael Chen',
     role: 'Travel Blogger',
     text: 'As someone who has visited water parks around the world, I can confidently say AquaVenture stands out with its innovative rides and impeccable safety standards.',
-    rating: 5
+    rating: 5 as const
   },
   {
     name: 'Emma Rodriguez',
     role: 'Local Resident',
     text: "I've been a season pass holder for three years, and the experience just keeps getting better. The staff is friendly, and they're always adding new attractions!",
-    rating: 4
+    rating: 4 as const
   }
 ];
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [favoriteAttraction, setFavoriteAttraction] = useState<string | null>(null);
   
   useEffect(() => {
     setIsLoaded(true);
+    
+    const userPrefs = getPreferences();
+    if (userPrefs.favoriteAttraction) {
+      setFavoriteAttraction(userPrefs.favoriteAttraction);
+      
+      setTimeout(() => {
+        toast("Welcome back!", {
+          description: `Ready for another adventure on the ${userPrefs.favoriteAttraction}?`,
+          duration: 5000,
+        });
+      }, 2000);
+    }
   }, []);
+  
+  const handleSetFavorite = (attraction: string) => {
+    setFavoriteAttraction(attraction);
+    savePreferences({ favoriteAttraction: attraction });
+    toast.success("Preference saved!", {
+      description: `We'll remember that you love the ${attraction}.`,
+    });
+  };
 
   return (
     <div className={`min-h-screen ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
       <Navigation />
       
-      {/* Hero Section */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {chatOpen ? (
+          <div className="bg-white rounded-xl shadow-xl w-80 sm:w-96 max-h-[500px] overflow-hidden flex flex-col">
+            <div className="bg-aqua-600 text-white p-3 flex justify-between items-center">
+              <h3 className="font-medium">Live Support</h3>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 text-white hover:bg-aqua-700 rounded-full"
+                onClick={() => setChatOpen(false)}
+              >
+                <X size={18} />
+              </Button>
+            </div>
+            <LiveChat />
+          </div>
+        ) : (
+          <Button 
+            onClick={() => setChatOpen(true)}
+            className="bg-aqua-600 hover:bg-aqua-700 rounded-full h-14 w-14 flex items-center justify-center shadow-lg"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </Button>
+        )}
+      </div>
+      
       <section 
         className="hero-section min-h-screen flex items-center justify-center px-4"
         style={{ 
@@ -152,7 +202,17 @@ const Index = () => {
         </div>
       </section>
       
-      {/* About Section */}
+      {favoriteAttraction && (
+        <div className="bg-aqua-50 border-l-4 border-aqua-500 p-4 my-6 mx-auto max-w-3xl rounded-r-lg shadow-md">
+          <div className="flex items-start">
+            <div className="flex-1">
+              <h3 className="font-medium text-gray-900">Personalized for you</h3>
+              <p className="text-gray-600">Based on your preferences, we recommend checking out the {favoriteAttraction} again!</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <section id="about" className="py-20 px-4">
         <div className="container mx-auto">
           <MotionWrapper>
@@ -197,7 +257,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Activities Section */}
       <section className="py-20 px-4 bg-gray-50">
         <div className="container mx-auto">
           <MotionWrapper>
@@ -211,7 +270,11 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
             {activities.map((activity, index) => (
               <MotionWrapper key={index} delay={0.2 + (index * 0.1)}>
-                <ActivityCard {...activity} />
+                <ActivityCard 
+                  {...activity} 
+                  onSetFavorite={() => handleSetFavorite(activity.title)}
+                  isFavorite={favoriteAttraction === activity.title}
+                />
               </MotionWrapper>
             ))}
           </div>
@@ -226,7 +289,28 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Call to Action */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto">
+          <MotionWrapper>
+            <SectionTitle 
+              subtitle="Virtual Experience"
+              title="Take A Virtual Tour"
+              description="Can't wait to visit? Explore our water park virtually and get a taste of the adventure that awaits you!"
+            />
+          </MotionWrapper>
+          
+          <div className="mt-12 aspect-video rounded-xl overflow-hidden shadow-xl">
+            <iframe 
+              src="https://www.youtube.com/embed/uUqaGc79Gwo?autoplay=0" 
+              title="Virtual Tour of AquaVenture"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      </section>
+      
       <section className="py-24 px-4 relative overflow-hidden">
         <div 
           className="absolute inset-0 z-0" 
@@ -253,7 +337,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Pricing Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto">
           <MotionWrapper>
@@ -276,16 +359,22 @@ const Index = () => {
             <p className="text-gray-600 mb-4">
               Looking for group rates or special events? Contact our customer service team for customized packages.
             </p>
-            <Link to="/tickets">
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white">
-                View All Ticket Options
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/tickets">
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white">
+                  View All Ticket Options
+                </Button>
+              </Link>
+              <Link to="/gift-cards">
+                <Button className="bg-aqua-600 hover:bg-aqua-700 text-white">
+                  Purchase Gift Cards
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
       
-      {/* Testimonials Section */}
       <section className="py-20 px-4 bg-gray-50 relative overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-30 bg-[radial-gradient(circle_at_bottom_left,#06b6d4,transparent),radial-gradient(circle_at_top_right,#bae6fd,transparent)]"></div>
         
@@ -308,7 +397,6 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Newsletter Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
           <MotionWrapper>

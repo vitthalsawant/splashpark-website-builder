@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Heart } from 'lucide-react';
 
 interface ActivityCardProps {
   title: string;
@@ -10,6 +11,8 @@ interface ActivityCardProps {
   image: string;
   path: string;
   className?: string;
+  onSetFavorite?: () => void;
+  isFavorite?: boolean;
 }
 
 const ActivityCard = ({ 
@@ -17,7 +20,9 @@ const ActivityCard = ({
   description, 
   image,
   path,
-  className 
+  className,
+  onSetFavorite,
+  isFavorite = false
 }: ActivityCardProps) => {
   return (
     <motion.div 
@@ -36,6 +41,25 @@ const ActivityCard = ({
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
+          
+          {onSetFavorite && (
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                onSetFavorite();
+              }}
+              className="absolute top-4 right-4 z-10 bg-white/20 backdrop-blur-sm p-2 rounded-full hover:bg-white/40 transition-colors"
+              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Heart 
+                size={20} 
+                className={cn(
+                  "transition-colors",
+                  isFavorite ? "fill-red-500 text-red-500" : "text-white"
+                )} 
+              />
+            </button>
+          )}
         </div>
         
         <div className="relative p-6 flex flex-col flex-grow bg-white">
