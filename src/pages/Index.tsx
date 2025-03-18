@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { Link } from "react-router-dom";
@@ -97,7 +96,7 @@ const testimonials = [
   {
     name: 'Emma Rodriguez',
     role: 'Local Resident',
-    text: 'I've been a season pass holder for three years, and the experience just keeps getting better. The staff is friendly, and they're always adding new attractions!',
+    text: "I've been a season pass holder for three years, and the experience just keeps getting better. The staff is friendly, and they're always adding new attractions!",
     rating: 4
   }
 ];
