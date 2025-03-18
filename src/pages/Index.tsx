@@ -12,6 +12,7 @@ import { MotionWrapper } from '@/components/animations/MotionWrapper';
 import { toast } from "sonner";
 import LiveChat from '@/components/LiveChat';
 import { getPreferences, savePreferences } from '@/utils/preferences';
+import ThreeDModelViewer from '@/components/ThreeDModelViewer';
 
 const activities = [
   {
@@ -257,7 +258,51 @@ const Index = () => {
         </div>
       </section>
       
-      <section className="py-20 px-4 bg-gray-50">
+      <section className="py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto">
+          <MotionWrapper>
+            <SectionTitle 
+              subtitle="Interactive 3D Experience"
+              title="Dive Into The Virtual World"
+              description="Experience our water park in a whole new dimension with interactive 3D models. Get a sneak peek of our equipment and attractions before your visit."
+            />
+          </MotionWrapper>
+          
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <MotionWrapper direction="right" delay={0.2}>
+              <div className="rounded-xl overflow-hidden shadow-xl bg-white">
+                <ThreeDModelViewer modelPath="/models/water_slide.glb" className="w-full" />
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">Water Slide Explorer</h3>
+                  <p className="text-gray-600">
+                    Take a closer look at our signature water slide designs. Rotate, zoom, and explore every detail before your visit.
+                  </p>
+                </div>
+              </div>
+            </MotionWrapper>
+            
+            <MotionWrapper direction="left" delay={0.4}>
+              <div className="rounded-xl overflow-hidden shadow-xl bg-white">
+                <ThreeDModelViewer modelPath="/models/swimming_gear.glb" className="w-full" />
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">Equipment Showcase</h3>
+                  <p className="text-gray-600">
+                    Explore our premium swimming equipment and gear. All included with your adventure package or available for rent.
+                  </p>
+                </div>
+              </div>
+            </MotionWrapper>
+          </div>
+          
+          <div className="text-center mt-12">
+            <Button className="bg-aqua-600 hover:bg-aqua-700 text-white">
+              Explore More 3D Models
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      <section className="py-20 px-4">
         <div className="container mx-auto">
           <MotionWrapper>
             <SectionTitle 
